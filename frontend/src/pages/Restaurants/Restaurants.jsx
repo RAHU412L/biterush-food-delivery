@@ -15,13 +15,62 @@ const Restaurants = () => {
   const navigate = useNavigate()
 
   const fetchRestaurants = async () => {
-    setLoading(true)
-    try {
-      const res = await api.get('/restaurants')
-      setRestaurants(res.data.data || [])
-      setFiltered(res.data.data || [])
-    } catch { setRestaurants([]) } finally { setLoading(false) }
+  setLoading(true)
+  try {
+    const res = await api.get('/restaurants')
+    const data = res.data.data || []
+
+    if (data.length > 0) {
+      setRestaurants(data)
+      setFiltered(data)
+    } else {
+      throw new Error("No backend data")
+    }
+
+  } catch {
+    // 🔥 Dummy fallback
+    const dummyRestaurants = [
+      {
+        _id: "1",
+        name: "Burger Hub",
+        cuisine: ["Fast Food", "Burger"],
+        rating: 4.5,
+        isOpen: true,
+        deliveryTime: 25,
+        minimumOrder: 100,
+        address: { city: "Delhi" },
+        image: ""
+      },
+      {
+        _id: "2",
+        name: "Pizza Palace",
+        cuisine: ["Italian", "Pizza"],
+        rating: 4.7,
+        isOpen: true,
+        deliveryTime: 30,
+        minimumOrder: 150,
+        address: { city: "Mumbai" },
+        image: ""
+      },
+      {
+        _id: "3",
+        name: "Biryani House",
+        cuisine: ["Indian", "Biryani"],
+        rating: 4.3,
+        isOpen: false,
+        deliveryTime: 35,
+        minimumOrder: 120,
+        address: { city: "Lucknow" },
+        image: ""
+      }
+    ]
+
+    setRestaurants(dummyRestaurants)
+    setFiltered(dummyRestaurants)
+  } finally {
+    setLoading(false)
   }
+}
 
   useEffect(() => { fetchRestaurants() }, [])
 

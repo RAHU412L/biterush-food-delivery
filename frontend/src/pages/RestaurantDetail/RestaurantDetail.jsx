@@ -14,14 +14,59 @@ const RestaurantDetail = () => {
   const [category, setCategory] = useState('All')
 
   useEffect(() => {
-    const fetchMenu = async () => {
-      try {
-        const res = await api.get(`/restaurant/${id}/menu`)
-        setData(res.data.data)
-      } catch { toast.error('Failed to load restaurant') } finally { setLoading(false) }
+  const fetchMenu = async () => {
+    try {
+      const res = await api.get(`/restaurant/${id}/menu`)
+      const data = res.data.data
+
+      if (data) {
+        setData(data)
+      } else {
+        throw new Error("No backend data")
+      }
+
+    } catch {
+      // 🔥 Dummy fallback
+      const dummyData = {
+        restaurant: {
+          name: "Demo Restaurant",
+          cuisine: ["Fast Food", "Italian"],
+          rating: 4.5,
+          isOpen: true,
+          deliveryTime: 30,
+          deliveryCharge: 50,
+          minimumOrder: 100
+        },
+        menu: [
+          {
+            _id: "1",
+            name: "Burger",
+            category: "Fast Food",
+            description: "Tasty burger",
+            price: 120,
+            image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd",
+            isAvailable: true
+          },
+          {
+            _id: "2",
+            name: "Pizza",
+            category: "Italian",
+            description: "Cheesy pizza",
+            price: 250,
+            image: "https://images.unsplash.com/photo-1594007654729-407eedc4be65",
+            isAvailable: true
+          }
+        ]
+      }
+
+      setData(dummyData)
+    } finally {
+      setLoading(false)
     }
-    fetchMenu()
-  }, [id])
+  }
+
+  fetchMenu()
+}, [id])
 
   if (loading) return <div className="rd-loading"><div className="spinner" /></div>
   if (!data)   return <div className="rd-error"><p>Restaurant not found</p><button onClick={() => navigate('/restaurants')}>← Back</button></div>
