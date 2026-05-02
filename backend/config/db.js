@@ -1,11 +1,21 @@
 import mongoose from "mongoose";
+import { logger } from '../middleware/logger.js';
 
-export const  connectDB = async () =>{
+export const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    logger.info('✅ MongoDB connected successfully');
 
-    await mongoose.connect(process.env.MONGODB_URI).then(()=>console.log("DB Connected"));
-   
-}
+    mongoose.connection.on('disconnected', () => {
+      logger.warn('MongoDB disconnected. Attempting to reconnect...');
+    });
 
+    mongoose.connection.on('reconnected', () => {
+      logger.info('MongoDB reconnected');
+    });
 
-// add your mongoDB connection string above.
-// Do not use '@' symbol in your databse user's password else it will show an error.
+  } catch (error) {
+    logger.error(`MongoDB connection failed: ${error.message}`);
+    process.exit(1);
+  }
+};
